@@ -1,20 +1,14 @@
-defmodule Relay.Irc.ConnectionHandler do
+defmodule Relay.LocationService.Irc.ConnectionHandler do
   defmodule State do
-    defstruct host: "***REMOVED***",
-              port: 6667,
-              pass: "",
-              nick: "andrewbot",
-              user: "andrewbot",
-              name: "andrewbot",
-              client: nil
+    defstruct [:host, :port, :pass, :nick, :user, :name, :client, :channels]
   end
 
-  def start_link(client, state \\ %State{}) do
+  def start_link(client, state) do
     GenServer.start_link(__MODULE__, [%{state | client: client}])
   end
 
   def init([state]) do
-    ExIrc.Client.add_handler state.client, self
+    ExIrc.Client.add_handler state.client, self()
     ExIrc.Client.connect! state.client, state.host, state.port
     {:ok, state}
   end
@@ -26,7 +20,7 @@ defmodule Relay.Irc.ConnectionHandler do
   end
 
   def handle_info(:logged_in, state) do
-    autojoin_channels
+    autojoin_channels()
     |> Enum.each(fn channel ->
          ExIrc.Client.join(state.client, channel)
        end)
@@ -42,7 +36,7 @@ defmodule Relay.Irc.ConnectionHandler do
   end
 
   defp autojoin_channels do
-    ~w[#lobby]
+    ~w[***REMOVED***x]
   end
 
   defp debug(msg) do

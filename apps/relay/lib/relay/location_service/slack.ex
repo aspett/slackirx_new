@@ -1,4 +1,4 @@
-defmodule Relay.Slack do
+defmodule Relay.LocationService.Slack do
   use Slack
 
   def handle_connect(slack, state) do

@@ -1,4 +1,4 @@
-defmodule Relay.Irc.DispatchHandler do
+defmodule Relay.LocationService.Irc.DispatchHandler do
   use GenServer
   @channel "#lobby"
 
@@ -10,13 +10,13 @@ defmodule Relay.Irc.DispatchHandler do
     {:ok, client}
   end
 
-  def handle_cast({:message, %{from: from, message: message}}, client) do
+  def handle_cast({:message, %{from: _from, message: message}}, client) do
     ExIrc.Client.msg(client, :privmsg, @channel, message)
 
     { :noreply, client }
   end
 
-  def dispatch(dispatch = {:message, event}) do
+  def dispatch(dispatch = {:message, _event}) do
     GenServer.cast(__MODULE__, dispatch)
 
     :ok

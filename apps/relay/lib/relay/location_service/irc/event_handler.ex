@@ -1,4 +1,4 @@
-defmodule Relay.Irc.EventHandler do
+defmodule Relay.LocationService.Irc.EventHandler do
   @moduledoc """
   This is an example event handler that you can attach to the client using
   `add_handler` or `add_handler_async`. To remove, call `remove_handler` or
@@ -13,7 +13,7 @@ defmodule Relay.Irc.EventHandler do
   end
 
   def init(client) do
-    ExIrc.Client.add_handler(client, self)
+    ExIrc.Client.add_handler(client, self())
 
     {:ok, nil}
   end
@@ -33,7 +33,7 @@ defmodule Relay.Irc.EventHandler do
     {:noreply, nil}
   end
 
-  def handle_info({:joined, channel}, _state) do
+  def handle_info({:joined, _channel}, _state) do
     # debug "Joined #{channel}"
     {:noreply, nil}
   end
@@ -61,7 +61,7 @@ defmodule Relay.Irc.EventHandler do
     {:noreply, nil}
   end
 
-  def handle_info(crap, _state) do
+  def handle_info(_crap, _state) do
     {:noreply, nil}
   end
 

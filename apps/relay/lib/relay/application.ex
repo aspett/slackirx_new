@@ -18,11 +18,11 @@ defmodule Relay.Application do
     children = [
       # Starts a worker by calling: Relay.Worker.start_link(arg1, arg2, arg3)
       # worker(Relay.Worker, [arg1, arg2, arg3]),
-      worker(Relay.Dispatch, []),
-      worker(Slack.Bot, [Relay.Slack, [], Application.get_env(:relay, :slack_token), %{name: :slack}]),
-      worker(Relay.Irc.EventHandler, [client]),
-      worker(Relay.Irc.ConnectionHandler, [client]),
-      worker(Relay.Irc.DispatchHandler, [client]),
+      # worker(Relay.Dispatch, []),
+      # worker(Slack.Bot, [Relay.Slack, [], Application.get_env(:relay, :slack_token), %{name: :slack}]),
+      # worker(Relay.Irc.EventHandler, [client]),
+      # worker(Relay.Irc.ConnectionHandler, [client]),
+      # worker(Relay.Irc.DispatchHandler, [client]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

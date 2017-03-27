@@ -39,7 +39,8 @@ defmodule Relay.Mixfile do
   defp deps do
     [
       {:exirc, "~> 1.0"},
-      {:slack, "~> 0.11"}
+      {:slack, "~> 0.11"},
+      {:ecto,  "~> 2.1.4"}
     ]
   end
 end
