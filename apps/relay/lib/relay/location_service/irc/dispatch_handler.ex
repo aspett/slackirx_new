@@ -1,6 +1,7 @@
 defmodule Relay.LocationService.Irc.DispatchHandler do
   use GenServer
-  @channel "#lobby"
+
+  @channel "***REMOVED***x"
 
   def start_link(client) do
     GenServer.start_link(__MODULE__, { :ok, client }, name: __MODULE__)
@@ -18,8 +19,6 @@ defmodule Relay.LocationService.Irc.DispatchHandler do
 
   def dispatch(dispatch = {:message, _event}) do
     GenServer.cast(__MODULE__, dispatch)
-
-    :ok
   end
 
   def dispatch(_) do

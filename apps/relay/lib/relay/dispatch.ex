@@ -9,8 +9,8 @@ defmodule Relay.Dispatch do
   def dispatch(event = %{source: :slack, type: :message, channel: "***REMOVED***", from: _from, message: _message}) do
     IO.puts "dispatching"
     IO.inspect(event)
+
     Relay.LocationService.Irc.DispatchHandler.dispatch({:message, event})
-    :ok
   end
 
   def dispatch(event = %{source: :irc, type: :message, from: _from, channel: _channel, message: _message}) do

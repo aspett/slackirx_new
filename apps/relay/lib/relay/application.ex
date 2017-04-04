@@ -23,6 +23,7 @@ defmodule Relay.Application do
       # worker(Relay.Irc.EventHandler, [client]),
       # worker(Relay.Irc.ConnectionHandler, [client]),
       # worker(Relay.Irc.DispatchHandler, [client]),
+      worker(Relay.LocationService.Supervisor, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
