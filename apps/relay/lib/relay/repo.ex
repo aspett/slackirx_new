@@ -7,10 +7,12 @@ defmodule Relay.Repo do
         pipe_id: 1,
         type: :dual,
         source: %Slack{
+          id: 1,
           token: Application.get_env(:relay, :slack_token),
           channel: "***REMOVED***"
         },
         destination: %Irc{
+          id: 1,
           bot_name: "andrewbot",
           server: "***REMOVED***",
           port: 6667,
