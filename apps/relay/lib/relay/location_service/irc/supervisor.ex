@@ -13,18 +13,17 @@ defmodule Relay.LocationService.Irc.Supervisor do
       name: location.bot_name
     }
 
-    Supervisor.start_link(__MODULE__, state)
+    Supervisor.start_link(__MODULE__, { state, location.channel })
   end
 
-  def init(state = %ConnectionHandler.State{}) do
-    {:ok, irc_client} = ExIrc.Client.start!
-
+  def init({ state = %ConnectionHandler.State{}, channel }) do
     children = [
-      worker(ConnectionHandler, [irc_client, state]),
-      worker(EventHandler, [irc_client]),
-      worker(DispatchHandler, [irc_client])
+      worker(ExIrc.Client, [[], [name: :irc_client]]),
+      worker(ConnectionHandler, [:irc_client, state]),
+      worker(EventHandler, [:irc_client]),
+      worker(DispatchHandler, [:irc_client, channel])
     ]
 
-    supervise(children, strategy: :one_for_one)
+    supervise(children, strategy: :one_for_all)
   end
 end

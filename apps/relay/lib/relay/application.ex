@@ -10,9 +10,6 @@ defmodule Relay.Application do
     import Supervisor.Spec, warn: false
     # Define workers and child supervisors to be supervised
 
-    {:ok, client} = ExIrc.start_client!
-    Process.register(client, :exirc_client)
-
     # IEx.pry
 
     children = [
