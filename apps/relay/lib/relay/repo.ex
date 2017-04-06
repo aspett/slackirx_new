@@ -1,7 +1,7 @@
 defmodule Relay.Repo do
   alias Relay.Location.{Slack,Irc,Pipeline}
 
-  def all do
+  def all(Pipeline) do
     [
       %Pipeline{
         pipe_id: 1,

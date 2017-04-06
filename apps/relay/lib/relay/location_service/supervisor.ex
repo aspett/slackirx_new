@@ -4,22 +4,20 @@ defmodule Relay.LocationService.Supervisor do
 
   use Supervisor
 
-  def start_link do
-    Supervisor.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link(pipeline) do
+    Supervisor.start_link(__MODULE__, pipeline, name: __MODULE__)
   end
 
-  def init([]) do
-    children = get_children()
+  def init(pipeline) do
+    {:ok, _} = Relay.Registry.Pipelines.register_pipeline(pipeline, self())
 
-    # IO.inspect(children)
-
-    supervise(children, strategy: :one_for_one)
+    supervise(get_children(pipeline), strategy: :one_for_one)
   end
 
-  def get_children() do
-    Relay.Repo.all
-    |> Enum.map(&children_for_pipeline/1)
-    |> List.flatten
+  def get_children(pipeline) do
+    pipeline
+    |> children_for_pipeline()
+    |> List.flatten()
   end
 
   defp children_for_pipeline(%Location.Pipeline{type: :dual, source: source, destination: destination}) do
