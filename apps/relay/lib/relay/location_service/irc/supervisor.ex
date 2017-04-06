@@ -26,7 +26,7 @@ defmodule Relay.LocationService.Irc.Supervisor do
       worker(DispatchHandler, [irc_client, location.channel])
     ]
 
-    Relay.Registry.Locations.register_location(location, self())
+    :ok = Relay.Registry.Locations.register_location(location, self())
 
     supervise(children, strategy: :one_for_all)
   end
