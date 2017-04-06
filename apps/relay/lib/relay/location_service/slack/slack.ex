@@ -30,8 +30,8 @@ defmodule Relay.LocationService.Slack do
   end
 
   def handle(crap, _, state) do
-    IO.puts "catchall"
-    IO.inspect(crap)
+    # IO.puts "catchall"
+    # IO.inspect(crap)
     { :ok, state }
   end
 

@@ -22,6 +22,7 @@ defmodule Relay.Application do
       # worker(Relay.Irc.DispatchHandler, [client]),
       # worker(Relay.LocationService.Supervisor, []),
       worker(Relay.Registry.Pipelines, []),
+      worker(Relay.Registry.Locations, []),
       worker(Relay.PipelineSupervisor, [])
     ]
 

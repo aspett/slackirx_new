@@ -4,5 +4,6 @@ defmodule Relay.Location.Slack do
   embedded_schema do
     field :token, :string
     field :channel, :string
+    field :pipeline_id, :integer
   end
 end

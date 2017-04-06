@@ -24,8 +24,8 @@ defmodule Relay.LocationService.Supervisor do
     [source, destination] |> Enum.map(&child_for_location/1)
   end
 
-  defp child_for_location(%Location.Slack{token: token}) do
-    [worker(Slack.Bot, [LocationService.Slack, [], token, %{name: :slack}])]
+  defp child_for_location(location = %Location.Slack{}) do
+    [worker(Relay.LocationService.Slack.Supervisor, [location])]
   end
 
   defp child_for_location(location = %Location.Irc{}) do

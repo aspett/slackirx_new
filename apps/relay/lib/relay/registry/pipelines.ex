@@ -30,7 +30,13 @@ defmodule Relay.Registry.Pipelines do
     { :error, :invalid }
   end
 
+  # def find_pipeline(locations = [_ | _]) do
+  #   :ets.select(@table, query)
+  # end
+
   # vv query from fun2ms
+  #:ets.fun2ms(fn {%{source: %{id: source_id}, destination: %{id: destination_id}}, pid} when source_id == 1 or destination_id == 1 -> pid end)
+  # [{{%{destination: %{id: :"$2"}, source: %{id: :"$1"}}, :"$3"}, [{:orelse, {:==, :"$1", 1}, {:==, :"$2", 1}}], [:"$3"]}]
   # [{{%{source: %{id: :"$1"}}, :"$2"}, [{:andalso, {:==, :"$1", 1}, {:is_pid, :"$2"}}], [:"$_"]}]
   # def find_pipeline do
   # end

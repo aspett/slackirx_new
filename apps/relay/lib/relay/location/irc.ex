@@ -6,5 +6,6 @@ defmodule Relay.Location.Irc do
     field :server, :string
     field :port, :integer
     field :channel, :string
+    field :pipeline_id, :integer
   end
 end
