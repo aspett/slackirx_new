@@ -1,6 +1,6 @@
 defmodule Relay.LocationService.Irc.ConnectionHandler do
   defmodule State do
-    defstruct [:host, :port, :pass, :nick, :user, :name, :client, :channels]
+    defstruct [:host, :port, :pass, :nick, :user, :name, :client, :channel]
   end
 
   def start_link(client, state) do
@@ -20,7 +20,8 @@ defmodule Relay.LocationService.Irc.ConnectionHandler do
   end
 
   def handle_info(:logged_in, state) do
-    autojoin_channels()
+    state
+    |> autojoin_channels()
     |> Enum.each(fn channel ->
          ExIrc.Client.join(state.client, channel)
        end)
@@ -35,8 +36,8 @@ defmodule Relay.LocationService.Irc.ConnectionHandler do
     {:noreply, state}
   end
 
-  defp autojoin_channels do
-    ~w[***REMOVED***x]
+  defp autojoin_channels(state) do
+    [state.channel]
   end
 
   defp debug(msg) do

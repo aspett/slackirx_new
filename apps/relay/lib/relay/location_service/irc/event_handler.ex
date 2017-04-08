@@ -38,12 +38,12 @@ defmodule Relay.LocationService.Irc.EventHandler do
     {:noreply, location}
   end
   # def handle_info({:received, message, sender}, _state) do
-  #   from = sender.nick
+  #   from = sender.nickk
   #   debug "#{from} sent us a private message: #{message}"
   #   {:noreply, nil}
   # end
 
-  def handle_info({:received, message, sender, channel}, location) do
+  def handle_info({:received, message, sender, channel}, location = %{channel: location_channel}) when channel == location_channel do
     from = sender.nick
     Relay.Dispatch.dispatch(location, %{source: :irc, type: :message, from: from, channel: channel, message: message})
 

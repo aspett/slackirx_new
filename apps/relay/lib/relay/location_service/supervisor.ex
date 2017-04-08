@@ -5,7 +5,7 @@ defmodule Relay.LocationService.Supervisor do
   use Supervisor
 
   def start_link(pipeline) do
-    Supervisor.start_link(__MODULE__, pipeline, name: __MODULE__)
+    Supervisor.start_link(__MODULE__, pipeline)
   end
 
   def init(pipeline) do

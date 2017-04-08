@@ -13,7 +13,7 @@ defmodule Relay.Dispatch do
   #   Relay.LocationService.Irc.DispatchHandler.dispatch({:message, event})
   # end
 
-  defp determine_destination(from_location = %{pipeline_id: pipeline_id}) do
+  def determine_destination(from_location = %{pipeline_id: pipeline_id}) do
     pipeline = Relay.Repo.get!(Relay.Location.Pipeline, pipeline_id)
 
     cond do
@@ -23,25 +23,30 @@ defmodule Relay.Dispatch do
     end
   end
 
-  defp find_destination_pid(location) do
+  def find_destination_pid(location) do
     Relay.Registry.Locations.find_dispatch_pid_by_location(location)
   end
 
   def dispatch(from_location, event = %{}) do
-    IO.puts("Dispatch")
+    IO.puts("Dispatch start")
     IO.inspect(from_location)
     IO.inspect(event)
     IO.puts("\n")
     to_location = determine_destination(from_location)
     dispatch_pid = find_destination_pid(to_location)
+    IO.puts("to_location")
+    IO.inspect(to_location)
+    IO.puts("dispatch_pid")
+    IO.inspect(dispatch_pid)
+    IO.puts("\n===========================")
     dispatch(to_location, dispatch_pid, event)
   end
 
-  defp dispatch(location = %Relay.Location.Irc{}, dispatch_pid, event) do
+  def dispatch(location = %Relay.Location.Irc{}, dispatch_pid, event) do
     Relay.LocationService.Irc.Supervisor.dispatch(location, dispatch_pid, event)
   end
 
-  defp dispatch(location = %Relay.Location.Slack{}, dispatch_pid, event) do
+  def dispatch(location = %Relay.Location.Slack{}, dispatch_pid, event) do
     Relay.LocationService.Slack.Supervisor.dispatch(location, dispatch_pid, event)
   end
 

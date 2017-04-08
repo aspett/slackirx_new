@@ -16,6 +16,6 @@ defmodule Relay.PipelineSupervisor do
   end
 
   def supervisor_for_pipeline(pipeline = %Relay.Location.Pipeline{}) do
-    supervisor(Relay.LocationService.Supervisor, [pipeline])
+    supervisor(Relay.LocationService.Supervisor, [pipeline], [id: pipeline.pipe_id])
   end
 end

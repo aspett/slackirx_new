@@ -25,7 +25,9 @@ defmodule Relay.LocationService.Slack do
     message = event.text
     { location, _, _ } = Relay.Registry.Locations.find_by_location_pid(self())
 
-    Relay.Dispatch.dispatch(location, %{source: :slack, type: :message, from: from, channel: channel, message: message})
+    if channel == location.channel do
+      Relay.Dispatch.dispatch(location, %{source: :slack, type: :message, from: from, channel: channel, message: message})
+    end
 
     { :ok, state }
   end

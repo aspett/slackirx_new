@@ -14,7 +14,8 @@ defmodule Relay.LocationService.Irc.Supervisor do
       pass: "",
       nick: location.bot_name,
       user: location.bot_name,
-      name: location.bot_name
+      name: location.bot_name,
+      channel: location.channel
     }
 
     irc_client = irc_client_name(location)
@@ -39,7 +40,7 @@ defmodule Relay.LocationService.Irc.Supervisor do
     :"#{supervisor_name(location)}.irc_client"
   end
 
-  def dispatch(location = %Relay.Location.Irc{}, dispatch_pid, event) when is_pid(dispatch_pid) do
+  def dispatch(%Relay.Location.Irc{}, dispatch_pid, event) when is_pid(dispatch_pid) do
     {_, pid, _, _} = Supervisor.which_children(dispatch_pid)
                      |> Enum.find(fn {id, _, :worker, _} -> id == Relay.LocationService.Irc.DispatchHandler end)
     Relay.LocationService.Irc.DispatchHandler.dispatch(pid, { :message, event })
