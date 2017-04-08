@@ -21,4 +21,11 @@ defmodule Relay.LocationService.Slack.Supervisor do
   def client_name(location = %Relay.Location.Slack{id: id}) do
     :"#{supervisor_name(location)}.slack_client"
   end
+
+  def dispatch(location = %Relay.Location.Slack{}, dispatch_pid, event = %{}) when is_pid(dispatch_pid) do
+    {_, pid, _, _} = Supervisor.which_children(dispatch_pid)
+                     |> Enum.find(fn {id, _, :worker, _} -> id == Slack.Bot end)
+
+    send pid, { :message, event }
+  end
 end

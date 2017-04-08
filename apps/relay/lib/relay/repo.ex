@@ -23,4 +23,8 @@ defmodule Relay.Repo do
       }
     ]
   end
+
+  def get!(Pipeline, pipe_id) do
+    all(Pipeline) |> List.first
+  end
 end

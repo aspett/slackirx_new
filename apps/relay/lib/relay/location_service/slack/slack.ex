@@ -23,8 +23,9 @@ defmodule Relay.LocationService.Slack do
     from = lookup_user_name(event.user, slack)
     channel = lookup_channel_name(event.channel, slack)
     message = event.text
+    { location, _, _ } = Relay.Registry.Locations.find_by_location_pid(self())
 
-    Relay.Dispatch.dispatch(%{source: :slack, type: :message, from: from, channel: channel, message: message})
+    Relay.Dispatch.dispatch(location, %{source: :slack, type: :message, from: from, channel: channel, message: message})
 
     { :ok, state }
   end
@@ -36,7 +37,8 @@ defmodule Relay.LocationService.Slack do
   end
 
   def handle_info({ :message, %{from: from, message: message}}, slack, state) do
-    channel_id = lookup_channel_id("***REMOVED***", slack)
+    { location, _, _ } = Relay.Registry.Locations.find_by_location_pid(self())
+    channel_id = lookup_channel_id(location.channel, slack)
     send_message("#{from}: #{message}", channel_id, slack)
 
     {:ok, state}

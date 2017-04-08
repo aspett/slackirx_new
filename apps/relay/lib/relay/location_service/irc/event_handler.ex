@@ -45,7 +45,7 @@ defmodule Relay.LocationService.Irc.EventHandler do
 
   def handle_info({:received, message, sender, channel}, location) do
     from = sender.nick
-    Relay.Dispatch.dispatch(%{source: :irc, type: :message, from: from, channel: channel, message: message})
+    Relay.Dispatch.dispatch(location, %{source: :irc, type: :message, from: from, channel: channel, message: message})
 
     {:noreply, location}
   end

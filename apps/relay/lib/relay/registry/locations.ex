@@ -36,4 +36,21 @@ defmodule Relay.Registry.Locations do
     { :error, :invalid }
   end
 
+  def find_by_location_pid(pid) when is_atom(pid) do
+    find_by_location_pid(Process.whereis(pid))
+  end
+
+  def find_by_location_pid(pid) do
+    [result] = :ets.match(@table, :"$1")
+               |> Enum.find(fn [{location, dispatch_pid, location_pid}] -> Process.whereis(location_pid) == pid end)
+
+    result
+  end
+
+  def find_dispatch_pid_by_location(location) do
+    query = [{{%{__struct__: :"$1", id: :"$2"}, :"$3", :"$4"}, [{:andalso, {:==, :"$1", location.__struct__}, {:==, :"$2", location.id}}], [:"$3"]}]
+    [pid] = :ets.select(@table, query)
+
+    pid
+  end
 end
