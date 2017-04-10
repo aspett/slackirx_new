@@ -5,13 +5,18 @@ defmodule Relay.LocationService.Supervisor do
   use Supervisor
 
   def start_link(pipeline) do
-    Supervisor.start_link(__MODULE__, pipeline)
+    Supervisor.start_link(__MODULE__, pipeline, name: supervisor_name(pipeline))
   end
 
   def init(pipeline) do
     {:ok, _} = Relay.Registry.Pipelines.register_pipeline(pipeline, self())
 
+    start_monitor(pipeline)
     supervise(get_children(pipeline), strategy: :one_for_one)
+  end
+
+  def start_monitor(pipeline) do
+    Relay.ProcessMonitor.start(self(), fn -> Relay.Registry.Pipelines.deregister_pipeline(pipeline) end)
   end
 
   def get_children(pipeline) do
@@ -30,5 +35,9 @@ defmodule Relay.LocationService.Supervisor do
 
   defp child_for_location(location = %Location.Irc{}) do
     [worker(LocationService.Irc.Supervisor, [location])]
+  end
+
+  defp supervisor_name(pipeline) do
+    :"LocationService.Supervisor.#{pipeline.pipe_id}"
   end
 end

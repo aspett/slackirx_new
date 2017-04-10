@@ -11,7 +11,13 @@ defmodule Relay.LocationService.Slack.Supervisor do
     ]
 
     :ok = Relay.Registry.Locations.register_location(location, self(), client_name(location))
+
+    start_monitor(location)
     supervise(children, strategy: :one_for_one)
+  end
+
+  def start_monitor(location) do
+    Relay.ProcessMonitor.start(self(), fn -> Relay.Registry.Locations.deregister_location(location) end)
   end
 
   def supervisor_name(%Relay.Location.Slack{id: id}) do

@@ -8,8 +8,8 @@ defmodule Relay.LocationService.Irc.EventHandler do
   #   start_link([])
   # end
 
-  def start_link(client, location) do
-    GenServer.start_link(__MODULE__, { client, location }, [])
+  def start_link(client, location, opts \\ []) do
+    GenServer.start_link(__MODULE__, { client, location }, opts)
   end
 
   def init({ client, location }) do

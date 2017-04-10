@@ -17,6 +17,14 @@ defmodule Relay.Registry.Locations do
 
   def handle_call({:register_location, location, dispatch_pid, location_pid}, _from, _state) do
     :ets.insert(@table, { location, dispatch_pid, location_pid })
+    IO.puts("Registered location")
+
+    {:reply, :ok, nil}
+  end
+
+  def handle_call({:deregister_location, location}, _from, _state) do
+    true = :ets.delete(@table, location)
+    IO.puts("Deregistered location")
 
     {:reply, :ok, nil}
   end
@@ -34,6 +42,11 @@ defmodule Relay.Registry.Locations do
 
   def register_location(_, _, _) do
     { :error, :invalid }
+  end
+
+  @spec deregister_location(%Relay.Location.Irc{} | %Relay.Location.Slack{}) :: :ok
+  def deregister_location(location) do
+    GenServer.call(__MODULE__, { :deregister_location, location })
   end
 
   def find_by_location_pid(pid) when is_atom(pid) do

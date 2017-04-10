@@ -17,8 +17,16 @@ defmodule Relay.Registry.Pipelines do
 
   def handle_call({:register_pipeline, pipeline, pid}, _from, _state) do
     :ets.insert(@table, { pipeline, pid })
+    IO.puts("Register pipeline")
 
     {:reply, { :ok, pid }, nil}
+  end
+
+  def handle_call({:deregister_pipeline, pipeline}, _from, _state) do
+    :ets.delete(@table, pipeline)
+    IO.puts("Deregister pipeline")
+
+    {:reply, :ok, nil}
   end
 
   @spec register_pipeline(%Relay.Location.Pipeline{}, pid()) :: {:ok, pid()} | {:error, :invalid}
@@ -28,6 +36,11 @@ defmodule Relay.Registry.Pipelines do
 
   def register_pipeline(_, _) do
     { :error, :invalid }
+  end
+
+  @spec deregister_pipeline(%Relay.Location.Pipeline{}) :: :ok
+  def deregister_pipeline(pipeline) do
+    GenServer.call(__MODULE__, { :deregister_pipeline, pipeline })
   end
 
   # def find_pipeline(locations = [_ | _]) do

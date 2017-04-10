@@ -1,8 +1,8 @@
 defmodule Relay.LocationService.Irc.DispatchHandler do
   use GenServer
 
-  def start_link(client, channel) do
-    GenServer.start_link(__MODULE__, { :ok, { client, channel } })
+  def start_link(client, channel, opts \\ []) do
+    GenServer.start_link(__MODULE__, { :ok, { client, channel } }, opts)
   end
 
   def init({:ok, state}) do

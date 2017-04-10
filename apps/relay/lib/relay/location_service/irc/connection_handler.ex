@@ -3,8 +3,8 @@ defmodule Relay.LocationService.Irc.ConnectionHandler do
     defstruct [:host, :port, :pass, :nick, :user, :name, :client, :channel]
   end
 
-  def start_link(client, state) do
-    GenServer.start_link(__MODULE__, [%{state | client: client}])
+  def start_link(client, state, opts \\ []) do
+    GenServer.start_link(__MODULE__, [%{state | client: client}], opts)
   end
 
   def init([state]) do
@@ -31,8 +31,8 @@ defmodule Relay.LocationService.Irc.ConnectionHandler do
 
   # Catch-all for messages you don't care about
   def handle_info(msg, state) do
-    debug "Received unknown messsage:"
-    IO.inspect msg
+    # debug "Received unknown messsage:"
+    # IO.inspect msg
     {:noreply, state}
   end
 
