@@ -45,10 +45,6 @@ defmodule Relay.LocationService.Irc.Supervisor do
     :"#{supervisor_name(location)}.#{child_descriptor}"
   end
 
-  # def irc_client_name(location = %Relay.Location.Irc{}) do
-  #   :"#{supervisor_name(location)}.irc_client"
-  # end
-
   def dispatch(%Relay.Location.Irc{}, dispatch_pid, event) when is_pid(dispatch_pid) do
     {_, pid, _, _} = Supervisor.which_children(dispatch_pid)
                      |> Enum.find(fn {id, _, :worker, _} -> id == Relay.LocationService.Irc.DispatchHandler end)
