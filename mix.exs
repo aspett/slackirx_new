@@ -22,7 +22,8 @@ defmodule Slackirx.Mixfile do
   # and cannot be accessed from applications inside the apps folder
   defp deps do
     [
-      {:ex_doc, "~> 0.14", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
+      {:inch_ex, only: :docs}
     ]
   end
 end
