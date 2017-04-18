@@ -1,6 +1,9 @@
 defmodule Relay.Repo do
   alias Relay.Location.{Slack,Irc,Pipeline}
 
+  @moduledoc false
+
+  @doc false
   def all(Pipeline) do
     [
       %Pipeline{
@@ -42,6 +45,7 @@ defmodule Relay.Repo do
     ]
   end
 
+  @doc false
   def get!(Pipeline, pipe_id) do
     Enum.find(all(Pipeline), fn pipeline -> pipeline.pipe_id == pipe_id end)
   end
