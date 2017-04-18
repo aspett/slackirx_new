@@ -46,6 +46,18 @@ defmodule Relay.LocationService.Slack do
     {:ok, state}
   end
 
+  def handle_info({ :start_monitor, supervisor_pid }, slack, state) when is_pid(supervisor_pid) do
+    IO.puts("Starting slack monitor")
+
+    Relay.ProcessMonitor.start(self(), fn ->
+      IO.puts("Killing supervisor_pid")
+      IO.inspect(supervisor_pid)
+      Process.exit(supervisor_pid, :kill)
+    end)
+
+    {:ok, state}
+  end
+
   def handle_info(info, _slack, state) do
     IO.puts("\nSlack Info")
     IO.inspect(info)

@@ -22,17 +22,17 @@ defmodule Relay.Registry.Locations do
     {:reply, :ok, nil}
   end
 
-  def handle_call({:deregister_location, location}, _from, _state) do
-    true = :ets.delete(@table, location)
+  def handle_call({:deregister_location, location, dispatch_pid, location_pid}, _from, _state) do
+    true = :ets.delete(@table, { location, dispatch_pid, location_pid })
     IO.puts("Deregistered location")
 
     {:reply, :ok, nil}
   end
 
-  @spec register_location(%Relay.Location.Irc{} | %Relay.Location.Slack{}, pid(), pid() | nil) :: {:ok, pid()} | {:error, :invalid}
+  @spec register_location(%Relay.Location.Irc{} | %Relay.Location.Slack{}, pid(), pid() | nil) :: :ok
   def register_location(location, dispatch_pid, location_pid \\ nil)
 
-  def register_location(location = %Location.Irc{}, dispatch_pid, location_pid) when is_pid(dispatch_pid) and (is_pid(location_pid) or is_nil(location_pid)) do
+  def register_location(location = %Location.Irc{}, dispatch_pid, nil) when is_pid(dispatch_pid) do
     GenServer.call(__MODULE__, { :register_location, location, dispatch_pid, nil })
   end
 
@@ -44,9 +44,10 @@ defmodule Relay.Registry.Locations do
     { :error, :invalid }
   end
 
-  @spec deregister_location(%Relay.Location.Irc{} | %Relay.Location.Slack{}) :: :ok
-  def deregister_location(location) do
-    GenServer.call(__MODULE__, { :deregister_location, location })
+  @spec deregister_location(%Relay.Location.Irc{} | %Relay.Location.Slack{}, pid(), pid() | nil) :: :ok
+  def deregister_location(location, dispatch_pid, location_pid \\ nil)
+  def deregister_location(location, dispatch_pid, location_pid) when is_pid(dispatch_pid) and (is_pid(location_pid) or is_atom(location_pid) or is_nil(location_pid))do
+    GenServer.call(__MODULE__, { :deregister_location, location, dispatch_pid, location_pid })
   end
 
   def find_by_location_pid(pid) when is_atom(pid) do

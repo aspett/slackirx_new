@@ -6,26 +6,29 @@ defmodule Relay.LocationService.Slack.Supervisor do
   end
 
   def init(location) do
+    supervisor_pid = self()
+
     children = [
-      worker(Slack.Bot, [Relay.LocationService.Slack, [], location.token, %{name: client_name(location)}])
+      worker(Slack.Bot, [Relay.LocationService.Slack, [], location.token, %{name: child_name(location, :slack_client)}]),
+      worker(Task, [fn -> send child_name(location, :slack_client), { :start_monitor, supervisor_pid } end], [restart: :temporary])
     ]
 
-    :ok = Relay.Registry.Locations.register_location(location, self(), client_name(location))
+    :ok = Relay.Registry.Locations.register_location(location, self(), child_name(location, :slack_client))
+    start_monitor(location, self(), child_name(location, :slack_client))
 
-    start_monitor(location)
-    supervise(children, strategy: :one_for_one)
+    supervise(children, strategy: :one_for_all)
   end
 
-  def start_monitor(location) do
-    Relay.ProcessMonitor.start(self(), fn -> Relay.Registry.Locations.deregister_location(location) end)
+  def start_monitor(location, sup_pid, client_pid) do
+    {:ok, _} = Relay.ProcessMonitor.start(self(), fn -> Relay.Registry.Locations.deregister_location(location, sup_pid, client_pid) end)
   end
 
   def supervisor_name(%Relay.Location.Slack{id: id}) do
     :"Slack.Supervisor.#{id}"
   end
 
-  def client_name(location = %Relay.Location.Slack{id: id}) do
-    :"#{supervisor_name(location)}.slack_client"
+  def child_name(location, child_descriptor) do
+    :"#{supervisor_name(location)}.#{child_descriptor}"
   end
 
   def dispatch(location = %Relay.Location.Slack{}, dispatch_pid, event = %{}) when is_pid(dispatch_pid) do

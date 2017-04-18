@@ -29,12 +29,12 @@ defmodule Relay.LocationService.Irc.Supervisor do
 
     :ok = Relay.Registry.Locations.register_location(location, self())
 
-    start_monitor(location)
+    start_monitor(location, self())
     supervise(children, strategy: :one_for_all)
   end
 
-  def start_monitor(location) do
-    Relay.ProcessMonitor.start(self(), fn -> Relay.Registry.Locations.deregister_location(location) end)
+  def start_monitor(location, supervisor_pid) do
+    Relay.ProcessMonitor.start(self(), fn -> Relay.Registry.Locations.deregister_location(location, supervisor_pid) end)
   end
 
   def supervisor_name(%Relay.Location.Irc{id: id}) do
