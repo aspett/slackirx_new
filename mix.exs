@@ -5,7 +5,8 @@ defmodule Slackirx.Mixfile do
     [apps_path: "apps",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     preferred_cli_env: [inch: :docs]]
   end
 
   # Dependencies can be Hex packages:

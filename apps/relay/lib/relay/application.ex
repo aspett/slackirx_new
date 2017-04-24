@@ -12,19 +12,16 @@ defmodule Relay.Application do
 
     # IEx.pry
 
-    children = [
-      # Starts a worker by calling: Relay.Worker.start_link(arg1, arg2, arg3)
-      # worker(Relay.Worker, [arg1, arg2, arg3]),
-      # worker(Relay.Dispatch, []),
-      # worker(Slack.Bot, [Relay.Slack, [], Application.get_env(:relay, :slack_token), %{name: :slack}]),
-      # worker(Relay.Irc.EventHandler, [client]),
-      # worker(Relay.Irc.ConnectionHandler, [client]),
-      # worker(Relay.Irc.DispatchHandler, [client]),
-      # worker(Relay.LocationService.Supervisor, []),
-      worker(Relay.Registry.Pipelines, []),
-      worker(Relay.Registry.Locations, []),
-      worker(Relay.PipelineSupervisor, [])
-    ]
+    children =
+      case Mix.env do
+        :dev ->
+          [
+            worker(Relay.Registry.Pipelines, []),
+            worker(Relay.Registry.Locations, []),
+            worker(Relay.PipelineSupervisor, [])
+          ]
+         _ -> []
+      end
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options

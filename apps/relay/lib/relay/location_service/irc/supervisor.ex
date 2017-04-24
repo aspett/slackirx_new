@@ -3,10 +3,18 @@ defmodule Relay.LocationService.Irc.Supervisor do
 
   alias Relay.LocationService.Irc.{ConnectionHandler, EventHandler, DispatchHandler}
 
+  @moduledoc """
+  Supervisor that starts up and supervises a Relay.Location.Irc location.
+  """
+
+  @doc "Starts the supervisor"
+  @spec start_link(Relay.Location.t) :: {:ok, pid}
   def start_link(location = %Relay.Location.Irc{}) do
     Supervisor.start_link(__MODULE__, location, name: supervisor_name(location))
   end
 
+  @doc false
+  @spec init(Relay.Location.t) :: {:ok, pid}
   def init(location) do
     state = %ConnectionHandler.State{
       host: location.server,
@@ -33,21 +41,30 @@ defmodule Relay.LocationService.Irc.Supervisor do
     supervise(children, strategy: :one_for_all)
   end
 
+  @doc "Dispatches the passed `event` to the DispatchHandler this supervisor supervises."
+  @spec dispatch(%Relay.Location.Irc{}, pid, Relay.Dispatch.event) :: :ok
+  def dispatch(%Relay.Location.Irc{}, dispatch_pid, event) when is_pid(dispatch_pid) do
+    {_, pid, _, _} = Supervisor.which_children(dispatch_pid)
+    |> Enum.find(fn {id, _, :worker, _} -> id == Relay.LocationService.Irc.DispatchHandler end)
+    Relay.LocationService.Irc.DispatchHandler.dispatch(pid, { :message, event })
+  end
+
+  @doc """
+  Starts a process that monitors this supervisor, and deregisters the location from the Relay.Registry.Locations when
+  it dies.
+  """
+  @spec start_monitor(Relay.Location.t, pid) :: {:ok, pid}
   def start_monitor(location, supervisor_pid) do
     Relay.ProcessMonitor.start(self(), fn -> Relay.Registry.Locations.deregister_location(location, supervisor_pid) end)
   end
 
-  def supervisor_name(%Relay.Location.Irc{id: id}) do
+  @doc false
+  defp supervisor_name(%Relay.Location.Irc{id: id}) do
     :"Irc.Supervisor.#{id}"
   end
 
-  def child_name(location, child_descriptor) do
+  @doc false
+  defp child_name(location, child_descriptor) do
     :"#{supervisor_name(location)}.#{child_descriptor}"
-  end
-
-  def dispatch(%Relay.Location.Irc{}, dispatch_pid, event) when is_pid(dispatch_pid) do
-    {_, pid, _, _} = Supervisor.which_children(dispatch_pid)
-                     |> Enum.find(fn {id, _, :worker, _} -> id == Relay.LocationService.Irc.DispatchHandler end)
-    Relay.LocationService.Irc.DispatchHandler.dispatch(pid, { :message, event })
   end
 end

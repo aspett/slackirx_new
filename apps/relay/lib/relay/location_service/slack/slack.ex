@@ -1,6 +1,15 @@
 defmodule Relay.LocationService.Slack do
   use Slack
 
+  @type slack_map :: map
+  @type state     :: map
+
+  @moduledoc """
+  Implementation of Slack.Bot. Should be started using Slack.Bot, not directly.
+  See [https://github.com/BlakeWilliams/Elixir-Slack]()
+  """
+
+  @doc false
   def handle_connect(slack, state) do
     IO.puts("Connected as #{slack.me.name}")
 
@@ -9,6 +18,7 @@ defmodule Relay.LocationService.Slack do
 
   # Swallow downstream errors, otherwise the websocket application breaks too
   # and that's pretty rubbish in my opinion.
+  @doc false
   def handle_event(event, slack, state) do
     try do
       handle(event, slack, state)
@@ -19,6 +29,16 @@ defmodule Relay.LocationService.Slack do
     { :ok, state }
   end
 
+  @doc false
+  def handle_close(_, _, state) do
+    { :ok, state }
+  end
+
+  @doc """
+  Handle a message coming from Slack, and send it to the dispatcher
+  """
+  @spec handle(Relay.Dispatch.event, slack_map, state) :: {:ok, state}
+  def handle(event, slack, state)
   def handle(event = %{type: "message"}, slack, state) do
     from = lookup_user_name(event.user, slack)
     channel = lookup_channel_name(event.channel, slack)
@@ -32,12 +52,12 @@ defmodule Relay.LocationService.Slack do
     { :ok, state }
   end
 
-  def handle(crap, _, state) do
-    # IO.puts "catchall"
-    # IO.inspect(crap)
+  def handle(_crap, _, state) do
     { :ok, state }
   end
 
+  @doc false
+  def handle_info(message, slack, state)
   def handle_info({ :message, %{from: from, message: message}}, slack, state) do
     { location, _, _ } = Relay.Registry.Locations.find_by_location_pid(self())
     channel_id = lookup_channel_id(location.channel, slack)
@@ -46,7 +66,7 @@ defmodule Relay.LocationService.Slack do
     {:ok, state}
   end
 
-  def handle_info({ :start_monitor, supervisor_pid }, slack, state) when is_pid(supervisor_pid) do
+  def handle_info({ :start_monitor, supervisor_pid }, _slack, state) when is_pid(supervisor_pid) do
     IO.puts("Starting slack monitor")
 
     Relay.ProcessMonitor.start(self(), fn ->

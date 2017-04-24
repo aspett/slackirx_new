@@ -1,20 +1,28 @@
 defmodule Relay.Registry.Pipelines do
   use GenServer
 
+  @moduledoc """
+  Registry for registering pipelines to their supervisor pids
+  """
+
   alias Relay.Location
 
   @table :pipeline_registry
 
+  @doc "Start the registry process"
+  @spec start_link() :: {:ok, pid}
   def start_link do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
+  @doc false
   def init(:ok) do
     :ets.new(@table, [:named_table, :duplicate_bag])
 
     {:ok, nil}
   end
 
+  @doc false
   def handle_call({:register_pipeline, pipeline, pid}, _from, _state) do
     :ets.insert(@table, { pipeline, pid })
     IO.puts("Register pipeline")
@@ -22,6 +30,7 @@ defmodule Relay.Registry.Pipelines do
     {:reply, { :ok, pid }, nil}
   end
 
+  @doc false
   def handle_call({:deregister_pipeline, pipeline}, _from, _state) do
     :ets.delete(@table, pipeline)
     IO.puts("Deregister pipeline")
@@ -29,7 +38,9 @@ defmodule Relay.Registry.Pipelines do
     {:reply, :ok, nil}
   end
 
+  @doc "Add an entry to the registry"
   @spec register_pipeline(%Relay.Location.Pipeline{}, pid()) :: {:ok, pid()} | {:error, :invalid}
+  def register_pipeline(pipeline, pid)
   def register_pipeline(pipeline = %Location.Pipeline{type: :dual}, pid) when is_pid(pid) do
     GenServer.call(__MODULE__, { :register_pipeline, pipeline, pid })
   end
@@ -38,6 +49,7 @@ defmodule Relay.Registry.Pipelines do
     { :error, :invalid }
   end
 
+  @doc "Remove an entry from the registry"
   @spec deregister_pipeline(%Relay.Location.Pipeline{}) :: :ok
   def deregister_pipeline(pipeline) do
     GenServer.call(__MODULE__, { :deregister_pipeline, pipeline })
