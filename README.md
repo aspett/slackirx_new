@@ -7,3 +7,5 @@ A personal project to relay messages between IRC and Slack (and possibly other p
 
 - Running Inch CI: `MIX_ENV=docs mix do deps.get, inchci.add`
 
+### Sample application tree
+[![Application tree](readme/tree.png)]()
