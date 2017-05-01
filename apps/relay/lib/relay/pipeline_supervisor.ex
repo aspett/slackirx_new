@@ -1,6 +1,8 @@
 defmodule Relay.PipelineSupervisor do
   use Supervisor
 
+  alias Relay.Location.Pipeline
+
   @moduledoc """
   Supverises a child per pipeline
   """
@@ -18,13 +20,36 @@ defmodule Relay.PipelineSupervisor do
     |> supervise(strategy: :one_for_one)
   end
 
-  @doc false
-  defp get_pipelines() do
-    Relay.Repo.all(Relay.Location.Pipeline)
+  @doc "Dynamically starts and supervises a pipeline's supervision tree"
+  @spec start_pipeline(%Pipeline{}) :: {:ok, pid}
+  def start_pipeline(pipeline)
+  def start_pipeline(pipeline = %Pipeline{}) do
+    {:ok, pid} = Supervisor.start_child(__MODULE__, supervisor_for_pipeline(pipeline))
+  end
+
+  @doc "Stops a pipeline's supervision tree, and removes it from this supervisor"
+  @spec stop_pipeline(%Pipeline{}) :: {:ok, term}
+  def stop_pipeline(pipeline)
+  def stop_pipeline(pipeline = %Pipeline{}) do
+    {^pipeline, pid} = Relay.Registry.Pipelines.find_by_pipeline(pipeline)
+
+    {child_id, _, _, _} =
+      Supervisor.which_children(__MODULE__)
+      |> Enum.find(fn {_, child_pid, _, _} -> child_pid == pid end)
+
+    Supervisor.terminate_child(__MODULE__, child_id)
+    Supervisor.delete_child(__MODULE__, child_id)
+
+    {:ok, child_id}
   end
 
   @doc false
-  defp supervisor_for_pipeline(pipeline = %Relay.Location.Pipeline{}) do
+  defp get_pipelines() do
+    Relay.Repo.all(Pipeline)
+  end
+
+  @doc false
+  defp supervisor_for_pipeline(pipeline = %Pipeline{}) do
     supervisor(Relay.LocationService.Supervisor, [pipeline], [id: pipeline.pipe_id])
   end
 end

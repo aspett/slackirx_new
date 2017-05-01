@@ -55,6 +55,16 @@ defmodule Relay.Registry.Pipelines do
     GenServer.call(__MODULE__, { :deregister_pipeline, pipeline })
   end
 
+  @doc "Finds the entry of a pipeline and it's pid by pipeline"
+  @spec find_by_pipeline(%Relay.Location.Pipeline{}) :: { %Relay.Location.Pipeline{}, pid }
+  def find_by_pipeline(pipeline)
+  def find_by_pipeline(pipeline = %Relay.Location.Pipeline{pipe_id: pipe_id}) do
+    query = [{{%{pipe_id: :"$1"}, :_}, [{:==, :"$1", pipe_id}], [:"$_"]}]
+    [{pipeline, pid}] = :ets.select(@table, query)
+
+    {pipeline, pid}
+  end
+
   # def find_pipeline(locations = [_ | _]) do
   #   :ets.select(@table, query)
   # end
