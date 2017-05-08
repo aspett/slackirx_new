@@ -6,7 +6,7 @@ defmodule Relay.Registry.Locations do
   Used for finding which pid to send a pipelined message to
   """
 
-  alias Relay.Location
+  alias Data.Location
 
   @table :location_registry
 
@@ -40,13 +40,13 @@ defmodule Relay.Registry.Locations do
   end
 
   @doc "Add an entry to the registry"
-  @spec register_location(%Relay.Location.Irc{} | %Relay.Location.Slack{}, pid(), pid() | nil) :: :ok
+  @spec register_location(Data.Location.t, pid(), pid() | nil) :: :ok
   def register_location(location, dispatch_pid, location_pid \\ nil)
-  def register_location(location = %Location.Irc{}, dispatch_pid, nil) when is_pid(dispatch_pid) do
+  def register_location(location = %Location{type: "irc"}, dispatch_pid, nil) when is_pid(dispatch_pid) do
     GenServer.call(__MODULE__, { :register_location, location, dispatch_pid, nil })
   end
 
-  def register_location(location = %Location.Slack{}, dispatch_pid, location_pid) when is_pid(dispatch_pid) and (is_pid(location_pid) or is_atom(location_pid)) do
+  def register_location(location = %Location{type: "slack"}, dispatch_pid, location_pid) when is_pid(dispatch_pid) and (is_pid(location_pid) or is_atom(location_pid)) do
     GenServer.call(__MODULE__, { :register_location, location, dispatch_pid, location_pid })
   end
 
@@ -55,7 +55,7 @@ defmodule Relay.Registry.Locations do
   end
 
   @doc "Remove an entry from the registry"
-  @spec deregister_location(%Relay.Location.Irc{} | %Relay.Location.Slack{}, pid(), pid() | nil) :: :ok
+  @spec deregister_location(Data.Location.t, pid(), pid() | nil) :: :ok
   def deregister_location(location, dispatch_pid, location_pid \\ nil)
   def deregister_location(location, dispatch_pid, location_pid) when is_pid(dispatch_pid) and (is_pid(location_pid) or is_atom(location_pid) or is_nil(location_pid))do
     GenServer.call(__MODULE__, { :deregister_location, location, dispatch_pid, location_pid })

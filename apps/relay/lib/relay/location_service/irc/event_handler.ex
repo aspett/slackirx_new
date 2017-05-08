@@ -4,13 +4,13 @@ defmodule Relay.LocationService.Irc.EventHandler do
   """
 
   @doc "Starts the process"
-  @spec start_link(pid(), %Relay.Location.Irc{} | %Relay.Location.Slack{}, list(any())) :: {:ok, pid()}
+  @spec start_link(pid(), %Data.Location{}, list(any())) :: {:ok, pid()}
   def start_link(client, location, opts \\ []) do
     GenServer.start_link(__MODULE__, { client, location }, opts)
   end
 
   @doc false
-  @spec init({ pid, Relay.Location.t }) :: {:ok, Relay.Location.t }
+  @spec init({ pid, Data.Location.t }) :: {:ok, Data.Location.t }
   def init({ client, location }) do
     ExIrc.Client.add_handler(client, self())
 

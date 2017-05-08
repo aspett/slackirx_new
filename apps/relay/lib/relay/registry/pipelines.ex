@@ -5,7 +5,7 @@ defmodule Relay.Registry.Pipelines do
   Registry for registering pipelines to their supervisor pids
   """
 
-  alias Relay.Location
+  alias Data.{Location, Pipeline}
 
   @table :pipeline_registry
 
@@ -39,9 +39,9 @@ defmodule Relay.Registry.Pipelines do
   end
 
   @doc "Add an entry to the registry"
-  @spec register_pipeline(%Relay.Location.Pipeline{}, pid()) :: {:ok, pid()} | {:error, :invalid}
+  @spec register_pipeline(Data.Pipeline.t, pid()) :: {:ok, pid()} | {:error, :invalid}
   def register_pipeline(pipeline, pid)
-  def register_pipeline(pipeline = %Location.Pipeline{type: :dual}, pid) when is_pid(pid) do
+  def register_pipeline(pipeline = %Pipeline{type: "dual"}, pid) when is_pid(pid) do
     GenServer.call(__MODULE__, { :register_pipeline, pipeline, pid })
   end
 
@@ -50,16 +50,16 @@ defmodule Relay.Registry.Pipelines do
   end
 
   @doc "Remove an entry from the registry"
-  @spec deregister_pipeline(%Relay.Location.Pipeline{}) :: :ok
+  @spec deregister_pipeline(Data.Pipeline.t) :: :ok
   def deregister_pipeline(pipeline) do
     GenServer.call(__MODULE__, { :deregister_pipeline, pipeline })
   end
 
   @doc "Finds the entry of a pipeline and it's pid by pipeline"
-  @spec find_by_pipeline(%Relay.Location.Pipeline{}) :: { %Relay.Location.Pipeline{}, pid }
+  @spec find_by_pipeline(Data.Pipeline.t) :: { Data.Pipeline.t, pid }
   def find_by_pipeline(pipeline)
-  def find_by_pipeline(pipeline = %Relay.Location.Pipeline{pipe_id: pipe_id}) do
-    query = [{{%{pipe_id: :"$1"}, :_}, [{:==, :"$1", pipe_id}], [:"$_"]}]
+  def find_by_pipeline(pipeline = %Pipeline{id: id}) do
+    query = [{{%{id: :"$1"}, :_}, [{:==, :"$1", id}], [:"$_"]}]
     [{pipeline, pid}] = :ets.select(@table, query)
 
     {pipeline, pid}

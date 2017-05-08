@@ -5,11 +5,11 @@ defmodule Relay.LocationService.Supervisor do
   Supervises the supervisors for each location involved in a given pipeline
   """
 
-  alias Relay.Location
+  alias Data.{Location, Pipeline}
   alias Relay.LocationService
 
   @doc "Starts the supervision tree process for a given pipeline"
-  @spec start_link(%Relay.Location.Pipeline{}) :: {:ok, pid}
+  @spec start_link(Data.Pipeline.t) :: {:ok, pid}
   def start_link(pipeline) do
     Supervisor.start_link(__MODULE__, pipeline, name: supervisor_name(pipeline))
   end
@@ -28,7 +28,7 @@ defmodule Relay.LocationService.Supervisor do
   end
 
   @doc "Returns a list of child specs for child processes that must be supervised for a given pipeline"
-  @spec get_children(%Relay.Location.Pipeline{}) :: [Supervisor.Spec.spec]
+  @spec get_children(Data.Pipeline.t) :: [Supervisor.Spec.spec]
   def get_children(pipeline) do
     pipeline
     |> children_for_pipeline()
@@ -36,22 +36,22 @@ defmodule Relay.LocationService.Supervisor do
   end
 
   @doc false
-  defp children_for_pipeline(%Location.Pipeline{type: :dual, source: source, destination: destination}) do
+  defp children_for_pipeline(%Pipeline{type: "dual", source: source, destination: destination}) do
     [source, destination] |> Enum.map(&child_for_location/1)
   end
 
   @doc false
-  defp child_for_location(location = %Location.Slack{}) do
+  defp child_for_location(location = %Location{type: "slack"}) do
     [worker(Relay.LocationService.Slack.Supervisor, [location])]
   end
 
   @doc false
-  defp child_for_location(location = %Location.Irc{}) do
+  defp child_for_location(location = %Location{type: "irc"}) do
     [worker(LocationService.Irc.Supervisor, [location])]
   end
 
   @doc false
   defp supervisor_name(pipeline) do
-    :"LocationService.Supervisor.#{pipeline.pipe_id}"
+    :"LocationService.Supervisor.#{pipeline.id}"
   end
 end

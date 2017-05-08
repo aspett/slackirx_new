@@ -1,7 +1,7 @@
 defmodule Relay.PipelineSupervisor do
   use Supervisor
 
-  alias Relay.Location.Pipeline
+  alias Data.Pipeline
 
   @moduledoc """
   Supverises a child per pipeline
@@ -45,11 +45,11 @@ defmodule Relay.PipelineSupervisor do
 
   @doc false
   defp get_pipelines() do
-    Relay.Repo.all(Pipeline)
+    Data.load_pipelines()
   end
 
   @doc false
   defp supervisor_for_pipeline(pipeline = %Pipeline{}) do
-    supervisor(Relay.LocationService.Supervisor, [pipeline], [id: pipeline.pipe_id])
+    supervisor(Relay.LocationService.Supervisor, [pipeline], [id: pipeline.id])
   end
 end

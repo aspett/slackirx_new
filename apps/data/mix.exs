@@ -1,8 +1,8 @@
-defmodule Relay.Mixfile do
+defmodule Data.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :relay,
+    [app: :data,
      version: "0.1.0",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
@@ -20,7 +20,7 @@ defmodule Relay.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger],
-     mod: {Relay.Application, []}]
+     mod: {Data.Application, []}]
   end
 
   # Dependencies can be Hex packages:
@@ -38,9 +38,9 @@ defmodule Relay.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:exirc, "~> 1.0"},
-      {:slack, "~> 0.11"},
-      {:data, in_umbrella: true}
+      {:ecto, "~> 2.1"},
+      {:postgrex, "~> 0.11"},
+      {:cachex, "~> 2.1"}
     ]
   end
 end
