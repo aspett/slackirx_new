@@ -12,7 +12,7 @@ defmodule Data.Application do
     children = [
       # Starts a worker by calling: Data.Worker.start_link(arg1, arg2, arg3)
       # worker(Data.Worker, [arg1, arg2, arg3]),
-      worker(Cachex, [:location_pipelines, []]),
+      worker(Data.Cache, []),
       supervisor(Data.Repo, [])
     ]
 
