@@ -2,24 +2,43 @@ defmodule Data.Cache do
   @pipeline_lookup :location_pipelines
 
   def start_link() do
-    Cachex.start_link(@pipeline_lookup, [])
+    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+  end
+
+  def init(:ok) do
+    :ets.new(@pipeline_lookup, [:named_table, :set])
+
+    {:ok, nil}
   end
 
   def cache_pipeline_lookups(pipelines) do
-    Cachex.clear(@pipeline_lookup)
-
-    Enum.each(pipelines, fn pipeline ->
-      Cachex.set!(@pipeline_lookup, pipeline.source.id, pipeline)
-      Cachex.set!(@pipeline_lookup, pipeline.destination.id, pipeline)
-    end)
-
+    :ok = GenServer.call(__MODULE__, { :cache_pipeline_lookups, pipelines })
     pipelines
   end
 
   def pipeline_for_location(location) do
-    case Cachex.get(:location_pipelines, location.id) do
-      {:ok, pipeline} -> pipeline
-      _               -> nil
+    lookup = GenServer.call(__MODULE__, { :pipeline_for_location, location })
+
+    case lookup do
+      [pipeline | _] -> pipeline
+      _              -> nil
     end
+  end
+
+  def handle_call({ :cache_pipeline_lookups, pipelines }, _from, _state) do
+    :ets.delete_all_objects(@pipeline_lookup)
+
+    Enum.each(pipelines, fn pipeline ->
+      :ets.insert(@pipeline_lookup, { pipeline.source.id, pipeline })
+      :ets.insert(@pipeline_lookup, { pipeline.destination.id, pipeline })
+    end)
+
+    { :reply, :ok, nil }
+  end
+
+  def handle_call({ :pipeline_for_location, location}, _from, _state) do
+    result = :ets.lookup(@pipeline_lookup, location.id)
+
+    {:reply, result, nil}
   end
 end
