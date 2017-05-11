@@ -22,8 +22,8 @@ defmodule Data.Cache do
     lookup = GenServer.call(__MODULE__, { :pipeline_for_location, location })
 
     case lookup do
-      [pipeline | _] -> pipeline
-      _              -> nil
+      [{_, pipeline } | _] -> pipeline
+      _                    -> nil
     end
   end
 
