@@ -4,6 +4,8 @@ defmodule Data.Pipeline do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @moduledoc false
+
   schema "pipelines" do
     field :type, :string
     field :name, :string

@@ -1,6 +1,8 @@
 defmodule Data.Cache do
   @pipeline_lookup :location_pipelines
 
+  @moduledoc false
+
   def start_link() do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end

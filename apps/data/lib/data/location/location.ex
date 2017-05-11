@@ -4,6 +4,8 @@ defmodule Data.Location do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @moduledoc false
+
   schema "locations" do
     field :name, :string
     field :type, :string
